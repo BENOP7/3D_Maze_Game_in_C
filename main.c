@@ -1,67 +1,67 @@
-#include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#define PI 3.14159265
+#include "game.h"
 
-// Screen dimension constants
-const int SCREEN_WIDTH = 1360;
-const int SCREEN_HEIGHT = 720;
-
-const int GRID_SIZE = 64;
-const int PLANE_SIZE2D = GRID_SIZE * 9;
-const int PPLANE_WIDTH = 320;
-const int PPLANE_HEIGHT = 200;
-const int DD = 277;
-
-int intersections[60];
 
 // Player's coordinate
-int playerX;
-int playerY;
-int pdx, pdy;
-int direction;
+float playerX;
+float playerY;
+float pdx, pdy;
+float direction;
+
+float dist(int ax, int ay, int bx, int by, float angle)
+{
+    return ( sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) );
+}
 
 void checkHorizontalIntersection(const int map[9][9], SDL_Renderer *renderer)
 {
-    int ray_x, ray_y, xo, yo, ray_direction = direction, dof, r;
+    int xo, yo, dof, r, distT, lineH;
+    float ray_x, ray_y, ray_direction = direction - ANGLE_30;
+    if (ray_direction < 0) ray_direction += P2I; if (ray_direction > P2I) ray_direction -= P2I;
     int coY;
     int coX;
 
-    for (r = 0; r < 3; r+=3)
+    for (r = 0; r < PPLANE_WIDTH; r++)
     {
         // horizontal
+        float distH = 1000000;
+        float hx = playerX - OFFSETX_2D, hy = playerY - OFFSETY_2D;
         dof = 0;
-        float aTan = - 1 / tan(ray_direction * (PI / 180));
-        if ( ray_direction > 180)
+        float aTan = - 1 / tan(ray_direction);
+        if ( ray_direction > PI)
         {
-            ray_y = ((playerY - 50) / 64) * 64 - 1;
-            ray_x = (playerX - 700) + ((playerY -50) - ray_y) * aTan;
+            ray_y = (((int)(playerY - OFFSETY_2D) >> 6) << 6) - 0.001;
+            ray_x = (playerX - OFFSETX_2D) + ((playerY - OFFSETY_2D) - ray_y) * aTan;
             yo = - GRID_SIZE;
             xo = -yo * aTan;
         }
         //vertically
-        if ( ray_direction < 180)
+        if ( ray_direction < PI)
         {
-            ray_y = (((playerY - 50) >> 6) << 6) + GRID_SIZE;
-            ray_x = (playerX - 700) + ((playerY -50) - ray_y) * aTan;
+            ray_y = (((int)(playerY - OFFSETY_2D) >> 6) << 6) + GRID_SIZE;
+            ray_x = (playerX - OFFSETX_2D) + ((playerY - OFFSETY_2D) - ray_y) * aTan;
             yo = GRID_SIZE;
             xo = -yo * aTan;
         }
     
         //looking left or right
-        if (ray_direction == 360 || ray_direction == 180)
+        if (ray_direction == P2I || ray_direction == P2I)
         {
-            ray_x = playerX - 700;
-            ray_y = playerY - 50;
+            ray_x = playerX - OFFSETX_2D;
+            ray_y = playerY - OFFSETY_2D;
             dof = 8;
         }
         while (dof < 8)
         {
-            coX = ray_x >> 6;
-            coY = ray_y >> 6;
+            coX = (int) ray_x >> 6;
+            coY = (int) ray_y >> 6;
             if (coX >= 0 && coY >= 0 && coX < 9 && coY < 9 && map[coY][coX] > 0)
             {
+                hx = ray_x;
+                hy = ray_y;
+                distH = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, hx, hy, ray_direction);
                 dof = 8;
             }
             else
@@ -71,45 +71,44 @@ void checkHorizontalIntersection(const int map[9][9], SDL_Renderer *renderer)
                 dof++;
             }
         }
-        SDL_SetRenderDrawColor(renderer, 0, 222, 0, 222);
 
-    SDL_RenderDrawLine(renderer, playerX, playerY, ray_x + 700, ray_y + 50);
-    }
-
-    for (r = 0; r < 3; r+=3)
-    {
-        // horizontal
+        // vertical
+        float distV = 1000000;
+        float vx = playerX - OFFSETX_2D, vy = playerY - OFFSETY_2D;
         dof = 0;
-        float nTan = -tan(ray_direction * (PI / 180));
-        if ( ray_direction > 90 || ray_direction < 270)
+        float nTan = -tan(ray_direction);
+        if (ray_direction > PI_HALF && ray_direction < PI_HALF3)
         {
-            ray_y = (((playerY - 50) >> 6) << 6) - 1;
-            ray_x = (playerX - 700) + ((playerY -50) - ray_y) * nTan;
-            xo = - GRID_SIZE;
+            ray_x = (((int) (playerX - 700) >> 6) << 6) - 0.001;
+            ray_y = (playerY - OFFSETY_2D) + ((playerX - OFFSETX_2D) - ray_x) * nTan;
+            xo = -GRID_SIZE;
             yo = -xo * nTan;
         }
-        //vertically
-        if ( ray_direction > 270 || ray_direction > 0)
+        // vertically
+        if (ray_direction > PI_HALF3 || ray_direction < PI_HALF)
         {
-            ray_y = (((playerY - 50) >> 6) << 6) + GRID_SIZE;
-            ray_x = (playerX - 700) + ((playerY -50) - ray_y) * nTan;
+            ray_x = (int) (((int)(playerX - OFFSETX_2D) >> 6) << 6) + GRID_SIZE;
+            ray_y = (playerY - OFFSETY_2D) + ((playerX - OFFSETX_2D) - ray_x) * nTan;
             xo = GRID_SIZE;
             yo = -xo * nTan;
         }
-    
-        //looking left or right
-        if (ray_direction == 90 || ray_direction == 270)
+
+        // looking down or up
+        if (ray_direction == PI_HALF || ray_direction == PI_HALF3)
         {
-            ray_x = playerX - 700;
-            ray_y = playerY - 50;
+            ray_x = playerX - OFFSETX_2D;
+            ray_y = playerY - OFFSETY_2D;
             dof = 8;
         }
         while (dof < 8)
         {
-            coX = ray_x >> 6;
-            coY = ray_y >> 6;
-            if (coX>=0&& coY>=0 && coX < 9 && coY < 9 && map[coY][coX] > 0)
+            coX = (int) ray_x >> 6;
+            coY = (int) ray_y >> 6;
+            if (coX >= 0 && coY >= 0 && coX < 9 && coY < 9 && map[coY][coX] > 0)
             {
+                vx = ray_x;
+                vy = ray_y;
+                distV = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, vx, vy, ray_direction);
                 dof = 8;
             }
             else
@@ -119,27 +118,28 @@ void checkHorizontalIntersection(const int map[9][9], SDL_Renderer *renderer)
                 dof++;
             }
         }
+
+        if (distV < distH)
+        {
+            distT = distV;
+            ray_x = vx, ray_y = vy;
+        }
+        if (distH < distV)
+        {
+            distT = distH;
+            ray_x = hx, ray_y = hy;
+        }
+        lineH = (DD * GRID_SIZE) / distT;
+        if (lineH > PPLANE_HEIGHT) lineH = PPLANE_HEIGHT;
+
+        SDL_SetRenderDrawColor(renderer, 45, 100, 154, 250);
+        SDL_RenderDrawLine(renderer, 110 + r, 160 + (PPLANE_HEIGHT / 2) - (lineH / 2), r + 110, 160 + (PPLANE_HEIGHT / 2) + (lineH / 2));
         SDL_SetRenderDrawColor(renderer, 255, 222, 0, 255);
+        SDL_RenderDrawLine(renderer, playerX, playerY, ray_x + OFFSETX_2D, ray_y + OFFSETY_2D);
 
-    SDL_RenderDrawLine(renderer, playerX, playerY, ray_x + 700, ray_y + 50);
+        ray_direction += INCR;
+        if (ray_direction < 0) ray_direction += P2I; if (ray_direction > P2I) ray_direction -= P2I;
     }
-
-    // if (direction < 0)
-    // {
-    //     initIntersectionY = (playerY << 6) >> 6 - 1;
-        
-    //     coY = initIntersectionY / GRID_SIZE;
-
-    //     initIntersectionX = playerX + (playerY - initIntersectionY) / tan((PI / 180) * direction);
-
-    //     coX = initIntersectionX / GRID_SIZE;
-
-        
-    // }
-
-    // intersections[0] = GRID_SIZE * coX;
-    //     intersections[1] = (coY + 1) * GRID_SIZE;
-    // if (map[coX][coY] == 1)    
 }
 
 int checkVerticalIntersection()
@@ -152,26 +152,26 @@ void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
     
     SDL_SetRenderDrawColor(renderer, 170, 170, 170, 170);
 
-    SDL_RenderDrawLine(renderer, 110, 160, 430, 160);
-    SDL_RenderDrawLine(renderer, 110, 360, 430, 360);
-    SDL_RenderDrawLine(renderer, 110, 160, 110, 360);
-    SDL_RenderDrawLine(renderer, 430, 160, 430, 360);
-    for (int i = 700; i <= 700 + PLANE_SIZE2D; i += GRID_SIZE)
+    SDL_RenderDrawLine(renderer, 110, 160, 110 + PPLANE_WIDTH, 160);
+    SDL_RenderDrawLine(renderer, 110 + PPLANE_WIDTH, 160, 110 + PPLANE_WIDTH, 360);
+    SDL_RenderDrawLine(renderer, 110, 160 + PPLANE_HEIGHT, 110, 160 + PPLANE_HEIGHT);
+    SDL_RenderDrawLine(renderer, 110 + PPLANE_WIDTH, 160, 110 + PPLANE_WIDTH, 160 + PPLANE_HEIGHT);
+    for (int i = OFFSETX_2D; i <= OFFSETX_2D + PLANE_SIZE2D; i += GRID_SIZE)
     {
         //Draw horizontal grid
-        SDL_RenderDrawLine(renderer, 700, i - 650, 700 + PLANE_SIZE2D, i - 650);
+        SDL_RenderDrawLine(renderer, OFFSETX_2D, i - 650, OFFSETX_2D + PLANE_SIZE2D, i - 650);
         //Draw vertical grid
-        SDL_RenderDrawLine(renderer, i, 50, i, 50 + PLANE_SIZE2D);
+        SDL_RenderDrawLine(renderer, i, OFFSETY_2D, i, OFFSETY_2D + PLANE_SIZE2D);
     }
 
     int idx;
     int idy;
-    for (int i = 700; i < 700 + PLANE_SIZE2D; i += GRID_SIZE)
+    for (int i = OFFSETX_2D; i < OFFSETX_2D + PLANE_SIZE2D; i += GRID_SIZE)
     {
-        idx = (i - 700) / GRID_SIZE;
-        for (int j = 50; j < 50 + PLANE_SIZE2D; j += GRID_SIZE)
+        idx = (i - OFFSETX_2D) / GRID_SIZE;
+        for (int j = OFFSETY_2D; j < OFFSETY_2D + PLANE_SIZE2D; j += GRID_SIZE)
         {
-            idy = (j - 50) / GRID_SIZE;
+            idy = (j - OFFSETY_2D) / GRID_SIZE;
             if (map[idy][idx] == 1)
             {
                 SDL_Rect rect = {i, j, GRID_SIZE, GRID_SIZE};
@@ -188,12 +188,12 @@ void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
 
     for (int i = playerX - 5; i <= playerX + 4; i++)
     {
-        int idx = i - playerX + 5;
+        idx = i - playerX + 5;
 
         for (int j = playerY - 5; j <= playerY + 4; j++)
         {
-            SDL_Point holder = {i, j};
-            points[10 * idx + j - playerY + 5] = holder;
+            SDL_Point holder = {.x = i, .y = j};
+            points[(int) (10 * idx + j - playerY + 5)] = holder;
         }
         
     }
@@ -225,15 +225,12 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     // Create window
-    window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL)
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
-
-    // Get window surface
-    screenSurface = SDL_GetWindowSurface(window);
 
     int map[9][9] = {
         { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -248,24 +245,20 @@ int main(int argc, char **argv)
     };
 
     //Default player position
-    playerX = 700 + 96;
-    playerY = 50 + 225;
+    playerX = OFFSETX_2D + 96;
+    playerY = OFFSETY_2D + 225;
 
-    direction = 300;
-    pdx = 10 * cos(PI / 180 * direction);
-    pdy = 10 * sin(PI / 180 * direction);
-
-    // Fill the surface white
-    SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-
-    // Update the surface
-    SDL_UpdateWindowSurface(window);
+    direction = 0.0f;                   /* Default player direction */
+    pdx = 4 * cos(direction);
+    pdy = 4 * sin(direction);
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Hack to get window to stay up
+    int up_pressed = 0, down_pressed = 0, right_pressed = 0, left_pressed = 0;
+
     SDL_Event e;
     int quit = 0;
+
     while (quit == 0)
     {
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 255);
@@ -281,27 +274,17 @@ int main(int argc, char **argv)
                 case SDL_KEYDOWN:
                 switch (e.key.keysym.sym) {
                     case SDLK_UP:
-                        playerX += pdx;;
-                        playerY += pdy;
+                        up_pressed = 1;
                         break;
                     case SDLK_DOWN:
                         // handle down arrow key pressed
-                        playerX -= pdx;
-                        playerY -= pdy;
+                        down_pressed = 1;
                         break;
                     case SDLK_LEFT:
-                        // handle left arrow key pressed
-                        direction -= 1;
-                        if (direction < 0) direction += 360;
-                        pdx = 10 * cos(PI / 180 * direction);
-                        pdy = 10 * sin(PI / 180 * direction);
+                        left_pressed = 1;
                         break;
                     case SDLK_RIGHT:
-                        // handle right arrow key pressed
-                        direction += 1;
-                        if (direction > 360 ) direction -= 360;
-                        pdx = 10 * cos(PI / 180 * direction);
-                        pdy = 10 * sin(PI / 180 * direction);
+                        right_pressed = 1;
                         break;
                     case SDLK_SPACE:
                         // handle space key pressed
@@ -309,6 +292,23 @@ int main(int argc, char **argv)
                     // add cases for other keys as needed
                 }
                 break;
+            case SDL_KEYUP:
+                switch (e.key.keysym.sym) {
+                    case SDLK_UP:
+                        up_pressed = 0;
+                        break;
+                    case SDLK_DOWN:
+                        // handle down arrow key pressed
+                        down_pressed = 0;
+                        break;
+                    case SDLK_LEFT:
+                        left_pressed = 0;
+                        break;
+                    case SDLK_RIGHT:
+                        right_pressed = 0;
+                        break;
+                }
+                break;    
             default:
                 break;
 
@@ -319,10 +319,92 @@ int main(int argc, char **argv)
         
         render(renderer, window, map);
         checkHorizontalIntersection(map, renderer);
+        
+        if (left_pressed && up_pressed)
+        {
+            direction -= UDEG;
+            if (direction < 0) direction += P2I;
+            pdx = 2 * cos(direction);
+            pdy = 2 * sin(direction);
+
+            playerX += pdx;
+            playerY += pdy;
+        }
+        else if (right_pressed && up_pressed)
+        {
+            direction += UDEG;
+            if (direction > P2I) direction -= P2I;
+            pdx = 4 * cos(direction);
+            pdy = 4 * sin(direction);
+            playerX += pdx;
+            playerY += pdy;
+        }
+        else if (up_pressed && down_pressed)
+        {
+            pdx = 0;
+            pdy = 0;
+        }
+        else if (left_pressed)
+        {
+            // handle left arrow key pressed
+             direction -= UDEG / 2;
+            if (direction < 0) direction += P2I;;
+        }
+        else if (right_pressed)
+        {
+            // handle left arrow key pressed
+            direction += UDEG / 2;
+            if (direction > P2I) direction -= P2I;
+            
+        }
+        else if (up_pressed)
+        {
+            pdx = 2 * cos(direction);
+            pdy = 2 * sin(direction);
+            playerX += pdx;
+            playerY += pdy;
+        }
+        else if (down_pressed)
+        {
+            pdx = 2 * cos(direction);
+            pdy = 2 * sin(direction);
+            playerX -= pdx;
+            playerY -= pdy;
+        }
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A])
+        // {
+        //     direction -= 1;
+        //     if (direction < 0) direction += 360;
+        //     pdx = 1 * cos(PI / 180 * direction);
+        //     pdy = 1 * sin(PI / 180 * direction);
+
+        //     playerX += pdx;
+        //     playerY += pdy;
+        // }
 
         SDL_RenderPresent(renderer);
     }
 
+
+
+
+    //Destroy renderer
+    SDL_DestroyRenderer(renderer);
     // Destroy window
     SDL_DestroyWindow(window);
 
