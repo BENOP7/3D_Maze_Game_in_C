@@ -3,6 +3,7 @@
 #include <math.h>
 #include "main.h"
 #include "render.h"
+#include "update.h"
 
 const double PI = 3.1415926535;
 const double P2I = 2 * PI;
@@ -14,13 +15,12 @@ const double ANGLE_30 = ANGLE_60 / 2;
 #define FOV ANGLE_60
 const double INCR = FOV / PPLANE_WIDTH;
 
-double posX = 45;
-double posY = 64;
+double posX = OFFSETX_2D + 90;
+double posY = OFFSETY_2D + 236;
 double pdx = 0;
 double pdy = 0;
 double direction = 0.0;
 
-int worldMap[9][9];
 
 int main(int argc, char *argv[])
 {
@@ -43,7 +43,9 @@ int main(int argc, char *argv[])
         { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
     };
     
-    gameloop(window, renderer);
+    pdx = 2 * cos(direction);
+    pdy = 2 * sin(direction);
+    gameloop(window, renderer, worldMap);
 
     //Destroy Renderer and Window
     SDL_DestroyRenderer(renderer);
@@ -94,7 +96,7 @@ int init_window(SDL_Window **window, SDL_Renderer **renderer)
  * renderer: The SDL renderer
  * 
 */
-void gameloop(SDL_Window *window, SDL_Renderer *renderer)
+void gameloop(SDL_Window *window, SDL_Renderer *renderer, int map[9][9])
 {
     int up_pressed = 0, down_pressed = 0, left_pressed = 0, right_pressed = 0; 
     SDL_Event e;
@@ -106,9 +108,12 @@ void gameloop(SDL_Window *window, SDL_Renderer *renderer)
         
         while (SDL_PollEvent(&e))
         {
-            eventHandler(e, &quit, &up_pressed, &down_pressed, &left_pressed, &right_pressed);
+            checkEvent(e, &quit, &up_pressed, &down_pressed, &left_pressed, &right_pressed);
         }
         render(renderer, window, NULL);
+        checkHorizontalIntersection(map, renderer);
+
+        eventHandler(up_pressed, down_pressed, left_pressed, right_pressed);
 
         SDL_RenderPresent(renderer);
 
@@ -116,7 +121,7 @@ void gameloop(SDL_Window *window, SDL_Renderer *renderer)
 }
 
 /**
- * eventHandler - Handle window and keyboard events such as keypressed
+ * checkEvent - Handle window and keyboard events such as keypressed
  * and close window button clicked
  * 
  * e: SDL event
@@ -127,7 +132,7 @@ void gameloop(SDL_Window *window, SDL_Renderer *renderer)
  * right_pressed: key right has been pressed? (boolean)
  * 
 */
-void eventHandler(SDL_Event e, int *quit, int *up_pressed, int *down_pressed, int *left_pressed, int *right_pressed)
+void checkEvent(SDL_Event e, int *quit, int *up_pressed, int *down_pressed, int *left_pressed, int *right_pressed)
 {
     switch (e.type)
     {
@@ -176,5 +181,64 @@ void eventHandler(SDL_Event e, int *quit, int *up_pressed, int *down_pressed, in
         break;
     default:
         break;
+    }
+}
+
+void eventHandler(int up, int down, int left, int right)
+{
+
+    if (left && up)
+    {
+        direction -= UDEG;
+        if (direction < 0)
+            direction += P2I;
+        pdx = 2 * cos(direction);
+        pdy = 2 * sin(direction);
+
+        posX += pdx;
+        posY += pdy;
+    }
+    else if (right && up)
+    {
+        direction += UDEG;
+        if (direction > P2I)
+            direction -= P2I;
+        pdx = 2 * cos(direction);
+        pdy = 2 * sin(direction);
+        posX += pdx;
+        posY += pdy;
+    }
+    else if (up && down)
+    {
+        pdx = 0;
+        pdy = 0;
+    }
+    else if (left)
+    {
+        // handle left arrow key pressed
+        direction -= UDEG;
+        if (direction < 0)
+            direction += P2I;
+    }
+    else if (right)
+    {
+        // handle left arrow key pressed
+        direction += UDEG;
+        if (direction > P2I)
+            direction -= P2I;
+    }
+    else if (up)
+    {
+        pdx = 2 * cos(direction);
+        pdy = 2 * sin(direction);
+        posX += pdx;
+        posY += pdy;
+    }
+    else if (down)
+    {
+        pdx = 2 * cos(direction);
+        pdy = 2 * sin(direction);
+        posX -= pdx;
+        posY -= pdy;
     }
 }

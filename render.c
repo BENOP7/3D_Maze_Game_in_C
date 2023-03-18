@@ -8,10 +8,10 @@ void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
     
     SDL_SetRenderDrawColor(renderer, 170, 170, 170, 170);
 
-    SDL_RenderDrawLine(renderer, 110, 160, 110 + PPLANE_WIDTH, 160);
-    SDL_RenderDrawLine(renderer, 110 + PPLANE_WIDTH, 160, 110 + PPLANE_WIDTH, 360);
-    SDL_RenderDrawLine(renderer, 110, 160 + PPLANE_HEIGHT, 110, 160 + PPLANE_HEIGHT);
-    SDL_RenderDrawLine(renderer, 110 + PPLANE_WIDTH, 160, 110 + PPLANE_WIDTH, 160 + PPLANE_HEIGHT);
+    SDL_RenderDrawLine(renderer, 45, 160, 45 + PPLANE_WIDTH, 160);
+    SDL_RenderDrawLine(renderer, 45 + PPLANE_WIDTH, 160, 45 + PPLANE_WIDTH, 160 + PPLANE_HEIGHT);
+    SDL_RenderDrawLine(renderer, 45, 160 + PPLANE_HEIGHT, 45 + PPLANE_WIDTH, 160 + PPLANE_HEIGHT);
+    SDL_RenderDrawLine(renderer, 45, 160, 45, 160 + PPLANE_HEIGHT);
     for (int i = OFFSETX_2D; i <= OFFSETX_2D + PLANE_SIZE2D; i += GRID_SIZE)
     {
         //Draw horizontal grid
