@@ -33,7 +33,6 @@ extern double posY;
 extern double pdx, pdy;
 extern double direction;
 
-
 int init_window(SDL_Window **, SDL_Renderer **);
 void gameloop(SDL_Window *, SDL_Renderer *);
 void eventHandler(SDL_Event e, int *quit, int *up_pressed, int *down_pressed, int *left_pressed, int *right_pressed);

@@ -20,6 +20,8 @@ double pdx = 0;
 double pdy = 0;
 double direction = 0.0;
 
+int worldMap[9][9];
+
 int main(int argc, char *argv[])
 {
     SDL_Window *window = NULL;
@@ -28,6 +30,18 @@ int main(int argc, char *argv[])
     
     if (init_window(&window, &renderer) != 0)
         return (EXIT_FAILURE);
+
+    int worldMap[9][9] = {
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+        { 1, 0, 0, 1, 0, 0, 1, 0, 1 },
+        { 1, 0, 0, 1, 0, 0, 1, 0, 1 },
+        { 1, 0, 0, 1, 0, 0, 0, 0, 1 },
+        { 1, 0, 0, 0, 0, 0, 0, 0, 1 },
+        { 1, 0, 0, 0, 1, 0, 1, 0, 1 },
+        { 1, 0, 1, 1, 1, 0, 1, 0, 1 },
+        { 1, 0, 0, 0, 0, 0, 1, 0, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+    };
     
     gameloop(window, renderer);
 
