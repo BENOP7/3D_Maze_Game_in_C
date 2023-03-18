@@ -14,6 +14,8 @@
 
 #define OFFSETX_2D 700
 #define OFFSETY_2D 50
+#define DISPLAY_OFFSETX 45
+#define DISPLAY_OFFSETY 95
 #define UDEG 0.0174533
 
 

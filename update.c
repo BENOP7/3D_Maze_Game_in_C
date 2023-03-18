@@ -119,7 +119,7 @@ void checkHorizontalIntersection(const int map[9][9], SDL_Renderer *renderer)
         if (lineH > PPLANE_HEIGHT) lineH = PPLANE_HEIGHT;
 
         SDL_SetRenderDrawColor(renderer, 45, 100, 154, 250);
-        SDL_RenderDrawLine(renderer, 110 + r, 160 + (PPLANE_HEIGHT / 2) - (lineH / 2), r + 110, 160 + (PPLANE_HEIGHT / 2) + (lineH / 2));
+        SDL_RenderDrawLine(renderer, DISPLAY_OFFSETX + r, DISPLAY_OFFSETY + (PPLANE_HEIGHT / 2) - (lineH / 2), r + DISPLAY_OFFSETX, DISPLAY_OFFSETY + (PPLANE_HEIGHT / 2) + (lineH / 2));
         SDL_SetRenderDrawColor(renderer, 255, 222, 0, 255);
         SDL_RenderDrawLine(renderer, posX, posY, ray_x + OFFSETX_2D, ray_y + OFFSETY_2D);
 

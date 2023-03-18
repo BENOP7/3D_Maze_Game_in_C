@@ -110,7 +110,7 @@ void gameloop(SDL_Window *window, SDL_Renderer *renderer, int map[9][9])
         {
             checkEvent(e, &quit, &up_pressed, &down_pressed, &left_pressed, &right_pressed);
         }
-        render(renderer, window, NULL);
+        render(renderer, window, map);
         checkHorizontalIntersection(map, renderer);
 
         eventHandler(up_pressed, down_pressed, left_pressed, right_pressed);
