@@ -150,7 +150,9 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
         
         SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT - lineH) * 0.5, r + 50, 60 + (PPLANE_HEIGHT + lineH) * 0.5);
 
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+
+        SDL_SetRenderDrawColor(renderer, 200, 150, 133, 255);
         SDL_RenderDrawLine(renderer, playerX, playerY, rx + OFFSETX_2D, ry + OFFSETY_2D);
     }
 }
@@ -244,6 +246,10 @@ int main(int argc, char **argv)
     if (cosine == NULL || sine == NULL || tangent == NULL || aTan == NULL)
     {
         printf("Memory alloc error!");
+        free(cosine);
+        free(sine);
+        free(tangent);
+        free(aTan);
         return EXIT_FAILURE;
     }
     
@@ -355,8 +361,8 @@ int main(int argc, char **argv)
         {
             direction -= 3 * UDEG / 2;
             if (direction < 0) direction += P2I;
-            pdx = 4 * cos(direction);
-            pdy = 4 * sin(direction);
+            pdx = 5 * cos(direction);
+            pdy = 5 * sin(direction);
 
             playerX += pdx;
             playerY += pdy;
@@ -365,8 +371,8 @@ int main(int argc, char **argv)
         {
             direction += 3 * UDEG / 2;
             if (direction > P2I) direction -= P2I;
-           pdx = 4 * cos(direction);
-            pdy = 4 * sin(direction);
+           pdx = 5 * cos(direction);
+            pdy = 5 * sin(direction);
             playerX += pdx;
             playerY += pdy;
         }
@@ -381,8 +387,8 @@ int main(int argc, char **argv)
              direction -= 3 * UDEG;
             if (direction < 0)
                 direction += P2I;
-            pdx = 4 * cos(direction);
-            pdy = 4 * sin(direction);
+            pdx = 5 * cos(direction);
+            pdy = 5 * sin(direction);
         }
         else if (right_pressed)
         {
@@ -390,8 +396,8 @@ int main(int argc, char **argv)
             direction += 3 * UDEG;
             if (direction > P2I)
                 direction -= P2I;
-           pdx = 4 * cos(direction);
-            pdy = 4 * sin(direction);
+           pdx = 5 * cos(direction);
+            pdy = 5 * sin(direction);
             
         }
         else if (up_pressed)
