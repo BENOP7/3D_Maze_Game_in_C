@@ -16,7 +16,7 @@ double *sine;
 double *tangent;
 double *aTan;
 
-float dist(int ax, int ay, int bx, int by, float angle)
+float dist(int ax, int ay, int bx, int by)
 {
     return ( sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) );
 }
@@ -30,7 +30,7 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
     float vx, vy , hx, hy;
     for (int r = 0; r < 320; r++)
     {
-        dof = 8;
+        dof = 0;
         float atann = - aTan[(int) ra];
 
         distV = distH = 1000000;
@@ -59,22 +59,27 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
             dof = 8;
         }
 
-        hx = rx;
-        hy = ry;
-        distH = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, hx, hy, ra);
         while (dof < 8)
-        {
-            if (1)
+        {            
+            mx = ((int) rx) >> 6;
+            my = ((int) ry) >> 6;
+            if (mx >= 0 && my >= 0 && mx < 9 && my < 9 && map[my][mx] > 0)
             {
-
+                dof = 8;
+                hx = rx;
+                hy = ry;
+                distH = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, hx, hy);
+                
             }
             else
             {
-                dof =+ 1;
+                rx += xo;
+                ry += yo;
+                dof++;
             }
         }
 
-        dof = 8;
+        dof = 0;
         float tann = - tangent[(int)ra];
 
         if (ra > 90 && ra < 270)
@@ -97,18 +102,24 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
             ry = playerY - OFFSETY_2D;
             dof = 8;
         }
-        vx = rx;
-        vy = ry;
-        distV = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, vx, vy, ra);
+        
         while (dof < 8)
         {
-            if (1)
+            mx = ((int) rx) >> 6;
+            my = ((int) ry) >> 6;
+            if (mx >= 0 && my >= 0 && mx < 9 && my < 9 && map[my][mx] > 0)
             {
-
+                dof = 8;
+                vx = rx;
+                vy = ry;
+                distV = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, vx, vy);
+                
             }
             else
             {
-                dof =+ 1;
+                rx += xo;
+                ry += yo;
+                dof++;
             }
         }
 
@@ -237,19 +248,25 @@ int main(int argc, char **argv)
         aTan[n] = 1 / tangent[n];
     }
 
-    printf("Cos: %lf\tSin: %lf\tTan: %lf\taTan: %lf", cosine[179], sine[179], tangent[179], aTan[179]);
-
     int map[9][9] = {
         { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-        { 1, 0, 0, 1, 0, 0, 1, 0, 1 },
-        { 1, 0, 0, 1, 0, 0, 1, 0, 1 },
-        { 1, 0, 0, 1, 0, 0, 0, 0, 1 },
-        { 1, 0, 0, 0, 0, 0, 0, 0, 1 },
+        { 1, 1, 0, 1, 0, 0, 1, 1, 1 },
+        { 1, 1, 0, 1, 0, 0, 1, 1, 1 },
+        { 1, 1, 0, 1, 0, 0, 0, 1, 1 },
+        { 1, 0, 0, 0, 0, 0, 0, 1, 1 },
         { 1, 0, 0, 0, 1, 0, 1, 0, 1 },
-        { 1, 0, 1, 1, 1, 0, 1, 0, 1 },
-        { 1, 0, 0, 0, 0, 0, 1, 0, 1 },
+        { 1, 0, 1, 1, 1, 0, 1, 1, 1 },
+        { 1, 1, 0, 0, 0, 0, 1, 0, 1 },
         { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
     };
+    for (int x = 0; x < 9; x++)
+    {
+        for (int y = 0; y < 9; y++)
+        {
+            printf("%d   ", map[x][y]);
+        }
+        printf("\n");
+    }
 
     //Default player position
     playerX = OFFSETX_2D + 96;
