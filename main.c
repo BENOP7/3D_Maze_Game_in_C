@@ -8,7 +8,7 @@
 float playerX;
 float playerY;
 float pdx, pdy;
-int direction;
+float direction;
 
 //tables
 double *cosine;
@@ -23,36 +23,37 @@ float dist(int ax, int ay, int bx, int by)
 
 void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
 {
-    int mx, my, dof, distT, lineH;
-    float ra = direction - 30; if (ra < 0) ra += 360;
+    int mx, my, dof;
+    float distT, lineH;
+    float ra = direction - ANGLE_30; if (ra < 0) ra += P2I;
     float rx, ry, xo, yo;
     float distV, distH;
     float vx, vy , hx, hy;
     for (int r = 0; r < PPLANE_WIDTH; r++)
     {
         dof = 0;
-        float atann = - aTan[(int) ra];
+        float atann = - 1 / tan(ra);
 
         distV = distH = 1000000;
 
         vx = hx = playerX - OFFSETX_2D;
         vy = hy = playerY - OFFSETY_2D;
         
-        if (ra > 180 && ra < 360)
+        if (ra > PI && ra < P2I)
         {
             ry = (((int) (playerY - OFFSETY_2D) >> 6) << 6) - 0.0001;
             rx = playerX - OFFSETX_2D + (playerY - OFFSETY_2D - ry) * atann;
             yo = - GRID_SIZE;
             xo = - yo * atann;
         }
-        if (ra > 0 && ra < 180)
+        if (ra > 0 && ra < PI)
         {
             ry = (((int) (playerY - OFFSETY_2D) >> 6) << 6) + GRID_SIZE;
             rx = playerX - OFFSETX_2D + (playerY - OFFSETY_2D - ry) * atann;
             yo = GRID_SIZE;
             xo = - yo * atann;
         }
-        if (ra == 180 || ra == 0 || ra == 360)
+        if (ra == PI || ra == 0 || ra == P2I)
         {
             rx = playerX - OFFSETX_2D;
             ry = playerY - OFFSETY_2D;
@@ -80,23 +81,23 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
         }
 
         dof = 0;
-        float tann = - tangent[(int)ra];
+        float tann = - tan(ra);
 
-        if (ra > 90 && ra < 270)
+        if (ra > PI_HALF && ra < PI_HALF3)
         {
             rx = (((int) (playerX - OFFSETX_2D) >> 6) << 6) - 0.0001;
             ry = playerY - OFFSETY_2D + (playerX - OFFSETX_2D - rx) * tann;
             xo = - GRID_SIZE;
             yo = - xo * tann;
         }
-        if (ra < 90 || ra > 270)
+        if (ra < PI_HALF || ra > PI_HALF3)
         {
             rx = (((int) (playerX - OFFSETX_2D) >> 6) << 6) + GRID_SIZE;
             ry = playerY - OFFSETY_2D + (playerX - OFFSETX_2D - rx) * tann;
             xo = GRID_SIZE;
             yo = - xo * tann;
         }
-        if (ra == 90 || ra == 270)
+        if (ra == PI_HALF || ra == PI_HALF3)
         {
             rx = playerX - OFFSETX_2D;
             ry = playerY - OFFSETY_2D;
@@ -136,17 +137,15 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
             SDL_SetRenderDrawColor(renderer, 33, 68, 100, 250);
         }
 
-        int beta = direction - ra;
-        if (beta < 0) beta += 360;
-        if (beta > 360) beta -= 360;
-
-        distT = distT * cosine[beta];
-
+        float beta = direction - ra; if (beta < 0) beta += P2I; if (beta > P2I) beta -= P2I;
+        distT = distT * cos(beta);
+            
         lineH = (DD * GRID_SIZE) / distT;
         if (lineH > PPLANE_HEIGHT) lineH = PPLANE_HEIGHT;
 
+
         ra += INCR;
-        if (ra > 360) ra -= 360;
+        if (ra > P2I) ra -= P2I;
 
         
         SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT - lineH) * 0.5, r + 50, 60 + (PPLANE_HEIGHT + lineH) * 0.5);
@@ -277,12 +276,12 @@ int main(int argc, char **argv)
     }
 
     //Default player position
-    playerX = OFFSETX_2D + 96;
-    playerY = OFFSETY_2D + 225;
+    playerX = OFFSETX_2D + 144;
+    playerY = OFFSETY_2D + 270;
 
-    direction = 300;
-    pdx = 4 * cosine[direction];
-    pdy = 4 * sine[direction];
+    direction = UDEG * 60;
+    pdx = 4 * cos(direction);
+            pdy = 4 * sin(direction);
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -354,20 +353,20 @@ int main(int argc, char **argv)
         
         if (left_pressed && up_pressed)
         {
-            direction -= 1;
-            if (direction < 0) direction += 360;
-            pdx = 4 * cosine[direction];
-            pdy = 4 * sine[direction];
+            direction -= 3 * UDEG / 2;
+            if (direction < 0) direction += P2I;
+            pdx = 4 * cos(direction);
+            pdy = 4 * sin(direction);
 
             playerX += pdx;
             playerY += pdy;
         }
         else if (right_pressed && up_pressed)
         {
-            direction += 1;
-            if (direction > 360) direction -= 360;
-            pdx = 4 * cosine[direction];
-            pdy = 4 * sine[direction];
+            direction += 3 * UDEG / 2;
+            if (direction > P2I) direction -= P2I;
+           pdx = 4 * cos(direction);
+            pdy = 4 * sin(direction);
             playerX += pdx;
             playerY += pdy;
         }
@@ -379,20 +378,20 @@ int main(int argc, char **argv)
         else if (left_pressed)
         {
             // handle left arrow key pressed
-             direction -= 1;
+             direction -= 3 * UDEG;
             if (direction < 0)
-                direction += 360;
-            pdx = 4 * cosine[direction];
-            pdy = 4 * sine[direction];
+                direction += P2I;
+            pdx = 4 * cos(direction);
+            pdy = 4 * sin(direction);
         }
         else if (right_pressed)
         {
             // handle left arrow key pressed
-            direction += 1;
-            if (direction > 360)
-                direction -= 360;
-            pdx = 4 * cosine[direction];
-            pdy = 4 * sine[direction];
+            direction += 3 * UDEG;
+            if (direction > P2I)
+                direction -= P2I;
+           pdx = 4 * cos(direction);
+            pdy = 4 * sin(direction);
             
         }
         else if (up_pressed)
