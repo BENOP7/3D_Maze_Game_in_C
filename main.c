@@ -23,12 +23,12 @@ float dist(int ax, int ay, int bx, int by)
 
 void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
 {
-    int mx, my, dof;
+    int mx, my, dof, distT, lineH;
     float ra = direction - 30; if (ra < 0) ra += 360;
     float rx, ry, xo, yo;
     float distV, distH;
     float vx, vy , hx, hy;
-    for (int r = 0; r < 320; r++)
+    for (int r = 0; r < PPLANE_WIDTH; r++)
     {
         dof = 0;
         float atann = - aTan[(int) ra];
@@ -125,24 +125,35 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
 
         if (distV < distH)
         {
+            distT = distV;
             rx = vx, ry = vy;
+            SDL_SetRenderDrawColor(renderer, 45, 100, 154, 250);
         }
         if (distH < distV)
         {
+            distT = distH;
             rx = hx, ry = hy;
+            SDL_SetRenderDrawColor(renderer, 33, 68, 100, 250);
         }
 
-        ra += 0.1875;
+        int beta = direction - ra;
+        if (beta < 0) beta += 360;
+        if (beta > 360) beta -= 360;
+
+        distT = distT * cosine[beta];
+
+        lineH = (DD * GRID_SIZE) / distT;
+        if (lineH > PPLANE_HEIGHT) lineH = PPLANE_HEIGHT;
+
+        ra += INCR;
         if (ra > 360) ra -= 360;
+
+        
+        SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT - lineH) * 0.5, r + 50, 60 + (PPLANE_HEIGHT + lineH) * 0.5);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderDrawLine(renderer, playerX, playerY, rx + OFFSETX_2D, ry + OFFSETY_2D);
     }
-}
-
-int checkVerticalIntersection()
-{
-
 }
 
 void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
@@ -150,10 +161,10 @@ void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
     
     SDL_SetRenderDrawColor(renderer, 170, 170, 170, 170);
 
-    SDL_RenderDrawLine(renderer, 110, 160, 110 + PPLANE_WIDTH, 160);
-    SDL_RenderDrawLine(renderer, 110 + PPLANE_WIDTH, 160, 110 + PPLANE_WIDTH, 360);
-    SDL_RenderDrawLine(renderer, 110, 160 + PPLANE_HEIGHT, 110, 160 + PPLANE_HEIGHT);
-    SDL_RenderDrawLine(renderer, 110 + PPLANE_WIDTH, 160, 110 + PPLANE_WIDTH, 160 + PPLANE_HEIGHT);
+    SDL_RenderDrawLine(renderer, 50, 60, 50 + PPLANE_WIDTH, 60);
+    SDL_RenderDrawLine(renderer, 50 + PPLANE_WIDTH, 60, 50 + PPLANE_WIDTH, 60 + PPLANE_HEIGHT);
+    SDL_RenderDrawLine(renderer, 50, 60, 50, 60 + PPLANE_HEIGHT);
+    SDL_RenderDrawLine(renderer, 50, 60 + PPLANE_HEIGHT, 50 + PPLANE_WIDTH, 60 + PPLANE_HEIGHT);
     for (int i = OFFSETX_2D; i <= OFFSETX_2D + PLANE_SIZE2D; i += GRID_SIZE)
     {
         //Draw horizontal grid
@@ -175,9 +186,6 @@ void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
                 SDL_Rect rect = {i, j, GRID_SIZE, GRID_SIZE};
                 SDL_RenderFillRect(renderer, &rect);
             }
-            // else{
-                
-            // }
         }
     }
 
