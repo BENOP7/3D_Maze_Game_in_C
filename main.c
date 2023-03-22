@@ -16,12 +16,15 @@ double *sine;
 double *tangent;
 double *aTan;
 
+//world
+int worldmap[GRID_NUM][GRID_NUM];
+
 float dist(int ax, int ay, int bx, int by)
 {
     return ( sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) );
 }
 
-void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
+void render3D(SDL_Renderer *renderer)
 {
     int mx, my, dof;
     float distT, lineH;
@@ -64,7 +67,7 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
         {            
             mx = ((int) rx) >> 6;
             my = ((int) ry) >> 6;
-            if (mx >= 0 && my >= 0 && mx < 9 && my < 9 && map[my][mx] > 0)
+            if (mx >= 0 && my >= 0 && mx < GRID_NUM && my < GRID_NUM && worldmap[my][mx] > 0)
             {
                 dof = 8;
                 hx = rx;
@@ -108,7 +111,7 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
         {
             mx = ((int) rx) >> 6;
             my = ((int) ry) >> 6;
-            if (mx >= 0 && my >= 0 && mx < 9 && my < 9 && map[my][mx] > 0)
+            if (mx >= 0 && my >= 0 && mx < GRID_NUM && my < GRID_NUM && worldmap[my][mx] > 0)
             {
                 dof = 8;
                 vx = rx;
@@ -150,17 +153,19 @@ void checkIntersections(const int map[9][9], SDL_Renderer *renderer)
         
         SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT - lineH) * 0.5, r + 50, 60 + (PPLANE_HEIGHT + lineH) * 0.5);
 
-
-
+        SDL_SetRenderDrawColor(renderer, 20, 150, 33, 255);
+        SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT + lineH) * 0.5, r + 50, 60 + PPLANE_HEIGHT);
+         SDL_SetRenderDrawColor(renderer, 0x48, 0xA2, 0xFF, 255);
+        SDL_RenderDrawLine(renderer, 50 + r, 60, r + 50, 60 + (PPLANE_HEIGHT - lineH) * 0.5);
         SDL_SetRenderDrawColor(renderer, 200, 150, 133, 255);
         SDL_RenderDrawLine(renderer, playerX, playerY, rx + OFFSETX_2D, ry + OFFSETY_2D);
     }
 }
 
-void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
+void render(SDL_Renderer * renderer, SDL_Window *window)
 {
     
-    SDL_SetRenderDrawColor(renderer, 170, 170, 170, 170);
+    SDL_SetRenderDrawColor(renderer, 50,33,23, 255);
 
     SDL_RenderDrawLine(renderer, 50, 60, 50 + PPLANE_WIDTH, 60);
     SDL_RenderDrawLine(renderer, 50 + PPLANE_WIDTH, 60, 50 + PPLANE_WIDTH, 60 + PPLANE_HEIGHT);
@@ -182,7 +187,7 @@ void render(SDL_Renderer * renderer, SDL_Window *window, const int map[9][9])
         for (int j = OFFSETY_2D; j < OFFSETY_2D + PLANE_SIZE2D; j += GRID_SIZE)
         {
             idy = (j - OFFSETY_2D) / GRID_SIZE;
-            if (map[idy][idx] == 1)
+            if (worldmap[idy][idx] == 1)
             {
                 SDL_Rect rect = {i, j, GRID_SIZE, GRID_SIZE};
                 SDL_RenderFillRect(renderer, &rect);
@@ -225,6 +230,55 @@ int main(int argc, char **argv)
     // The surface contained by the window
     SDL_Surface *screenSurface = NULL;
 
+    for (int i = 0; i < GRID_NUM; i++)
+    {
+        for (int j = 0; j < GRID_NUM; j++)
+        {
+           
+            worldmap[i][j] = 0;
+        }
+    }
+
+    if (argc > 2)
+    {
+        fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
+        return (EXIT_FAILURE);
+    }
+    if (argc == 2)
+    {
+        FILE *file = fopen(argv[1], "r");
+        if (file == NULL)
+        {
+            fprintf(stderr, "Could not open file! check file path or format.\
+\nFilename: %s\n", argv[1]);
+            return (EXIT_FAILURE);
+        }
+
+        int ch, n = 0;
+
+        do {
+            ch = fgetc(file);
+            if (ch >= '0' && ch <= '9')
+            {
+                worldmap[n / GRID_NUM][n % GRID_NUM] = ch - '0';
+                printf("%d  ", worldmap[n / 10][n % 10]);
+                n++;
+            }
+            
+        } while (ch != EOF || n < GRID_NUM * GRID_NUM);
+
+        fclose(file);
+
+        for (int i = 0; i < GRID_NUM; i++)
+        {
+            for (int j = 0; j < GRID_NUM; j++)
+            {
+                printf("%d   ", worldmap[i][j]);
+            }
+            printf("\n");
+        }
+    }
+
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -261,22 +315,11 @@ int main(int argc, char **argv)
         aTan[n] = 1 / tangent[n];
     }
 
-    int map[9][9] = {
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-        { 1, 1, 0, 1, 0, 0, 1, 1, 1 },
-        { 1, 1, 0, 1, 0, 0, 1, 1, 1 },
-        { 1, 1, 0, 1, 0, 0, 0, 1, 1 },
-        { 1, 0, 0, 0, 0, 0, 0, 1, 1 },
-        { 1, 0, 0, 0, 1, 0, 1, 0, 1 },
-        { 1, 0, 1, 1, 1, 0, 1, 1, 1 },
-        { 1, 1, 0, 0, 0, 0, 1, 0, 1 },
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-    };
-    for (int x = 0; x < 9; x++)
+    for (int x = 0; x < GRID_NUM; x++)
     {
-        for (int y = 0; y < 9; y++)
+        for (int y = 0; y < GRID_NUM; y++)
         {
-            printf("%d   ", map[x][y]);
+            printf("%d   ", worldmap[x][y]);
         }
         printf("\n");
     }
@@ -298,7 +341,7 @@ int main(int argc, char **argv)
 
     while (quit == 0)
     {
-        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 255);
+        SDL_SetRenderDrawColor(renderer, 0x78, 0x78, 0x78, 55);
         SDL_RenderClear(renderer);
         
         while (SDL_PollEvent(&e))
@@ -354,8 +397,8 @@ int main(int argc, char **argv)
         }
 
         
-        render(renderer, window, map);
-        checkIntersections(map, renderer);
+        render(renderer, window);
+        render3D(renderer);
         
         if (left_pressed && up_pressed)
         {
