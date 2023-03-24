@@ -36,6 +36,13 @@ const double P2I = PI * 2;
 #define FOV ANGLE_60
 const double INCR = FOV / PPLANE_WIDTH;
 
+extern float playerX;
+extern float playerY;
+extern float pdx, pdy;
+extern float direction;
+
+extern int worldmap[GRID_NUM][GRID_NUM];
+
 int handleEvents(int *, int *, int *, int *, int *);
 void SDL_close(SDL_Renderer *, SDL_Window *, double *,
                  double *, double *, double *);
