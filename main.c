@@ -368,7 +368,7 @@ int main(int argc, char **argv)
     int up_pressed = 0, down_pressed = 0, right_pressed = 0, left_pressed = 0;
     int hideMap = 0, q_pressed = 0;
 
-    SDL_Event e;
+    
     int quit = 0;
     int time_d = 0;
 
@@ -380,64 +380,7 @@ int main(int argc, char **argv)
         SDL_SetRenderDrawColor(renderer, 0x78, 0x78, 0x78, 55);
         SDL_RenderClear(renderer);
         
-        while (SDL_PollEvent(&e))
-        {
-            switch ( e.type )
-            {
-                case SDL_QUIT:
-                    quit = 1;
-                    break;
-                case SDL_KEYDOWN:
-                switch (e.key.keysym.sym) {
-                    case SDLK_w:
-                        up_pressed = 1;
-                        break;
-                    case SDLK_s:
-                        // handle down arrow key pressed
-                        down_pressed = 1;
-                        break;
-                    case SDLK_a:
-                        left_pressed = 1;
-                        break;
-                    case SDLK_d:
-                        right_pressed = 1;
-                        // printf("Rightly setup\n");
-                        break;
-                    case SDLK_q:
-                        q_pressed = 1;
-                        break;
-                    case SDLK_SPACE:
-                        // handle space key pressed
-                        break;
-                    // add cases for other keys as needed qqqq
-                }
-                break;
-            case SDL_KEYUP:
-                switch (e.key.keysym.sym) {
-                    case SDLK_w:
-                        up_pressed = 0;
-                        break;
-                    case SDLK_s:
-                        // handle down arrow key pressed
-                        down_pressed = 0;
-                        break;
-                    case SDLK_a:
-                        left_pressed = 0;
-                        break;
-                    case SDLK_d:
-                        right_pressed = 0;
-                        break;
-                    case SDLK_q:
-                        q_pressed = 0;
-                        break;
-                }
-                break;    
-            default:
-                break;
-
-            }
-
-        }
+        quit = handleEvents(&up_pressed, &down_pressed, &left_pressed, &right_pressed, &q_pressed);
 
         int xo = 0, yo = 0;
         if (pdx < 0) xo = - 30; else xo = 30;
@@ -524,9 +467,82 @@ int main(int argc, char **argv)
         // SDL_Delay(5);
     }
 
+    SDL_close(renderer, window, cosine, sine, tangent, aTan);   
 
+    return 0;
+}
 
+int handleEvents(int *up_pressed, int *down_pressed, int *left_pressed,
+                 int *right_pressed, int *q_pressed)
+{
+    SDL_Event e;
+    int quit = 0;
 
+    while (SDL_PollEvent(&e))
+    {
+        switch (e.type)
+        {
+        case SDL_QUIT:
+            quit = 1;
+            break;
+        case SDL_KEYDOWN:
+            switch (e.key.keysym.sym)
+            {
+            case SDLK_w:
+                *up_pressed = 1;
+                break;
+            case SDLK_s:
+                // handle down arrow key pressed
+                *down_pressed = 1;
+                break;
+            case SDLK_a:
+                *left_pressed = 1;
+                break;
+            case SDLK_d:
+                *right_pressed = 1;
+                // printf("Rightly setup\n");
+                break;
+            case SDLK_q:
+                *q_pressed = 1;
+                break;
+            case SDLK_SPACE:
+                // handle space key pressed
+                break;
+                // add cases for other keys as needed qqqq
+            }
+            break;
+        case SDL_KEYUP:
+            switch (e.key.keysym.sym)
+            {
+            case SDLK_w:
+                *up_pressed = 0;
+                break;
+            case SDLK_s:
+                // handle down arrow key pressed
+                *down_pressed = 0;
+                break;
+            case SDLK_a:
+                *left_pressed = 0;
+                break;
+            case SDLK_d:
+                *right_pressed = 0;
+                break;
+            case SDLK_q:
+                *q_pressed = 0;
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return (quit);
+}
+
+void SDL_close(SDL_Renderer *renderer, SDL_Window *window, double *cosine,
+               double *sine, double *tangent, double *aTan)
+{
     //Destroy renderer
     SDL_DestroyRenderer(renderer);
     // Destroy window
@@ -538,6 +554,4 @@ int main(int argc, char **argv)
     free(aTan);
     // Quit SDL subsystems
     SDL_Quit();
-
-    return 0;
 }
