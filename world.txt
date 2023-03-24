@@ -1,0 +1,27 @@
+
+	{1, 1, 1, 1, 1, 1, 1, 1, 1 1},
+        { 1, 0, 0, 1, 0, 0, 0, 0, 0 1},
+        { 1, 0, 0, 1, 0, 0, 0, 1, 0 1},
+        { 1, 1, 0, 1, 0, 0, 0, 0, 0 1},
+        { 1, 0, 0, 0, 0, 0, 0, 1, 0 1},
+        { 1, 0, 0, 0, 1, 0, 1, 1, 0 1},
+        { 1, 0, 1, 1, 1, 0, 1, 0, 0 1},
+        { 1, 0, 1, 0, 0, 0, 0, 1, 0 1},
+	{ 1, 0, 0, 0, 0, 0, 0, 0, 0 1},
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1 1} 
+
+extern const double ANGLE_60;
+extern const double ANGLE_30;
+extern  const double PI_HALF;
+extern  const double PI_HALF3;
+extern const double PI;
+extern const double P2I;
+extern const double INCR;
+
+const double ANGLE_60 = 3.14159265 / 180 * 60;
+const double ANGLE_30 = ANGLE_60 / 2;
+const double PI_HALF = 3.14159265 / 2;
+const double PI_HALF3 = PI_HALF * 2;
+const double PI = PI_HALF * 2;
+const double P2I = PI * 2;
+const double INCR = ANGLE_60 / PPLANE_WIDTH;
