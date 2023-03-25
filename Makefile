@@ -1,2 +1,2 @@
 all:
-	gcc -o game render.c main.c -lSDL2 -lm
+	gcc -o game init.c update.c render.c parser.c main.c -lSDL2 -lm

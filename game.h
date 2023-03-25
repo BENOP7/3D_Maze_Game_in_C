@@ -15,6 +15,8 @@
 
 #define OFFSETX_2D 700
 #define OFFSETY_2D 50
+#define DISPLAY_OFFSETX 45
+#define DISPLAY_OFFSETY 95
 #define UDEG 0.017453292519943
 
 
@@ -26,16 +28,6 @@ extern const double PI;
 extern const double P2I;
 extern const double INCR;
 
-const double PI = 3.1415926535897932;
-const double PI_HALF = PI / 2;
-const double ANGLE_60 = PI / 3;
-const double ANGLE_30 = ANGLE_60 / 2;
-const double PI_HALF3 = PI_HALF * 3;
-const double P2I = PI * 2;
-
-#define FOV ANGLE_60
-const double INCR = FOV / PPLANE_WIDTH;
-
 extern float playerX;
 extern float playerY;
 extern float pdx, pdy;
@@ -46,5 +38,9 @@ extern int worldmap[GRID_NUM][GRID_NUM];
 int handleEvents(int *, int *, int *, int *, int *);
 void SDL_close(SDL_Renderer *, SDL_Window *, double *,
                  double *, double *, double *);
+int init_window(SDL_Window **, SDL_Renderer **);
+void gameloop(SDL_Renderer *);
+void eventHandler(int, int, int, int, int);
+
 
 #endif
