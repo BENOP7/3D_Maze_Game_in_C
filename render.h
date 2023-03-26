@@ -2,12 +2,15 @@
 #define RENDER_H
 
 #include <SDL2/SDL.h>
-#include "game.h"
-#include "update.h"
+// #ifndef GAME_H
+// #define GAME_H
+
+// #include "game.h"
+
+// #endif
 
 void render(SDL_Renderer *, int);
 void drawPlayer(SDL_Renderer *);
-void renderMap(SDL_Renderer *);
-void render3D(SDL_Renderer *, int);
+void drawWorld(SDL_Renderer *, const int (*)[9]);
 
 #endif
