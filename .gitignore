@@ -6,9 +6,8 @@ lib/*
 *.out
 .vscode/
 *.dll
-Makefile
+*file
 *~
 src/
 *json
-Makefile
 game
