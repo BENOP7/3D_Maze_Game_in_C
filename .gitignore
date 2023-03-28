@@ -8,6 +8,6 @@ lib/*
 *.dll
 *file
 *~
-game
 src/
 *json
+game
