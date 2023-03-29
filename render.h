@@ -13,5 +13,6 @@ void render(SDL_Renderer *, int);
 void render3D(SDL_Renderer *renderer, int hideMap);
 void drawPlayer(SDL_Renderer *);
 void drawWorld(SDL_Renderer *, const int (*)[9]);
+void print();
 
 #endif

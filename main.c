@@ -42,15 +42,7 @@ int main(int argc, char **argv)
 
     int elapseTime, currentTime, previousTime = 0;
 
-    for (int i = 0; i < GRID_NUM; i++)
-    {
-        for (int j = 0; j < GRID_NUM; j++)
-        {
-           
-            worldmap[i][j] = 0;
-        }
-    }
-
+    print();
     if (argc > 2)
     {
         fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
@@ -135,15 +127,6 @@ int main(int argc, char **argv)
         sine[n] = sin(UDEG * n);
         tangent[n] = tan(UDEG * n);
         aTan[n] = 1 / tangent[n];
-    }
-
-    for (int x = 0; x < GRID_NUM; x++)
-    {
-        for (int y = 0; y < GRID_NUM; y++)
-        {
-            printf("%d   ", worldmap[x][y]);
-        }
-        printf("\n");
     }
 
     //Default player position

@@ -2,6 +2,23 @@
 #include "render.h"
 #include "update.h"
 #include "wall.ppm"
+#include "texture.ppm"
+
+void print()
+{
+    float t = (playerX + 32)/ 2.0 + cos(PI/4) * 158 * 32 / 33.0 / 1.0;
+     printf("%d  ", t);
+     printf("%d  %d ", texture[(int)t & 31], (int) t & 31 );
+     printf("%d  ", (340 - PPLANE_HEIGHT / 2));
+    // for (int i = 0; i < 32 * 32; i++)
+    // {
+    //     printf("%d  ", texture[i]);
+    //     if ((i+1) % 8 == 0)
+    //         printf("\n");
+    //     if ((i + 1)% 64 == 0 )
+    //         printf("\n");
+    // }
+}
 
 void render3D(SDL_Renderer *renderer, int hideMap)
 {
@@ -105,7 +122,7 @@ void render3D(SDL_Renderer *renderer, int hideMap)
                 dof++;
             }
         }
-        int tx;
+        float tx;
         float shade = 0.5;
         if (distV < distH)
         {          
@@ -135,14 +152,40 @@ void render3D(SDL_Renderer *renderer, int hideMap)
 
         for (int y = 0; y <= lineH; y++)
         {
-            SDL_SetRenderDrawColor(renderer, wall[(int) ty * 192 + (tx * 3)] * shade, wall[(int) ty * 192 + (tx * 3) + 1] * shade, wall[(int) ty * 192 + (tx * 3) + 2] * shade, 255);
+            SDL_SetRenderDrawColor(renderer, wall[(int) ty * 192 + ((int)tx * 3)] * shade, wall[(int) ty * 192 + ((int)tx * 3) + 1] * shade, wall[(int) ty * 192 + ((int)tx * 3) + 2] * shade, 255);
             SDL_RenderDrawPoint(renderer, 50 + r, y + 60 + upperoff);
             ty += dy;
         }
-        SDL_SetRenderDrawColor(renderer, 20, 150, 33, 255);
-        SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT + lineH) * 0.5, r + 50, 60 + PPLANE_HEIGHT);
-        SDL_SetRenderDrawColor(renderer, 0x48, 0xA2, 0xFF, 255);
-        SDL_RenderDrawLine(renderer, 50 + r, 60, r + 50, 60 + (PPLANE_HEIGHT - lineH) * 0.5);
+        float depth, raFix, dd, dxf, dyf, dist;
+        int c;
+
+        for (int y = upperoff + lineH; y < PPLANE_HEIGHT; y++)
+        {
+            raFix = cos(beta);
+
+            depth = y - (PPLANE_HEIGHT / 2.0f);
+
+            dd = DD * (GRID_SIZE / 2.0f) / depth;
+            // compute ray length
+            dist = dd / raFix;
+
+            dxf = cos(ra) * dist;
+            dyf = sin(ra) * dist;
+
+            tx = (playerX - OFFSETX_2D + dxf) / 2.0f;
+            ty = (playerY - OFFSETY_2D + dyf) / 2.0f;
+
+            c = texture[((int) ty % 32) * 32 + ((int) tx % 32)];
+            SDL_SetRenderDrawColor(renderer, c * 140, c * 140, c * 140, 255);
+            SDL_RenderDrawPoint(renderer, 50 + r, y + 60);
+
+        }
+    
+
+        // SDL_SetRenderDrawColor(renderer, 20, 150, 33, 255);
+        // SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT + lineH) * 0.5, r + 50, 60 + PPLANE_HEIGHT);
+        // SDL_SetRenderDrawColor(renderer, 0x48, 0xA2, 0xFF, 255);
+        // SDL_RenderDrawLine(renderer, 50 + r, 60, r + 50, 60 + (PPLANE_HEIGHT - lineH) * 0.5);
         if (!hideMap)
         {
             SDL_SetRenderDrawColor(renderer, 200, 150, 133, 255);
