@@ -1,9 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "main.h"
 #include "game.h"
+#include "init.h"
 #include "update.h"
 #include "render.h"
+#include "parser.h"
 
 const double PI = 3.1415926535897932;
 const double PI_HALF = PI / 2;
@@ -27,124 +30,38 @@ double *sine;
 double *tangent;
 double *aTan;
 
+
+
 //world
 int worldmap[GRID_NUM][GRID_NUM];
-// int texture[1024];
 
-
+int time_d = 0;
+int up_pressed, down_pressed, right_pressed, left_pressed;
+int hideMap = 0, q_pressed = 0;
+int elapseTime, currentTime, previousTime = 0;
+    
 int main(int argc, char **argv)
 {
-    // The window we'll be rendering to
+    int quit = 0;
+    
     SDL_Window *window = NULL;
+    SDL_Renderer *renderer = NULL;
 
-    // The surface contained by the window
-    SDL_Surface *screenSurface = NULL;
-
-    int elapseTime, currentTime, previousTime = 0;
-
-    print();
+    if (argc == 2)
+    {
+            if (parseMap(argv[1]) != 0)
+            {
+                fprintf(stderr, "Error while parsing map file\n");
+                return (EXIT_FAILURE);
+            }
+    }
+    
     if (argc > 2)
     {
         fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
         return (EXIT_FAILURE);
     }
-    if (argc == 2)
-    {
-        FILE *file = fopen(argv[1], "r");
-        if (file == NULL)
-        {
-            fprintf(stderr, "Could not open file! check file path or format.\
-\nFilename: %s\n", argv[1]);
-            return (EXIT_FAILURE);
-        }
-
-        int ch, n = 0;
-
-        do {
-            ch = fgetc(file);
-            if (ch >= '0' && ch <= '9')
-            {
-                worldmap[n / GRID_NUM][n % GRID_NUM] = ch - '0';
-                n++;
-            }
-            
-        } while (ch != EOF || n < GRID_NUM * GRID_NUM);
-
-        fclose(file);
-    }
-    // FILE *f = fopen("texture.txt", "r");
-    // int ch, n = 0;
-    // do {
-    //     ch = fgetc(f);
-    //     if (ch >= '0' && ch <= '9')
-    //     {
-    //         texture[n++] = ch - '0';
-    //     }
-
-    // } while (ch != EOF || n < 1024);
-
-    // fclose(f);
-
-    // for (int i = 0; i < n; i++)
-    // {
-    //         printf("%d", texture[i]);
-    //     if ((i + 1) > 0 && (i + 1) % 8 == 0)
-    //         printf("\n");
-    // }
-
-
-    // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-        return EXIT_FAILURE;
-    }
-    // Create window
-    window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == NULL)
-    {
-        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-        return EXIT_FAILURE;
-    }
-
-    cosine = malloc(sizeof(*cosine) * 360);
-    sine = malloc(sizeof(*sine) * 360);
-    tangent = malloc(sizeof(*tangent) * 360);
-    aTan = malloc(sizeof(*aTan) * 360);
-    if (cosine == NULL || sine == NULL || tangent == NULL || aTan == NULL)
-    {
-        printf("Memory alloc error!");
-        free(cosine);
-        free(sine);
-        free(tangent);
-        free(aTan);
-        return EXIT_FAILURE;
-    }
-    
-    for (int n = 0; n < 360; n++)
-    {
-        cosine[n] = cos(UDEG * n);    
-        sine[n] = sin(UDEG * n);
-        tangent[n] = tan(UDEG * n);
-        aTan[n] = 1 / tangent[n];
-    }
-
-    //Default player position
-    playerX = OFFSETX_2D + 144;
-    playerY = OFFSETY_2D + 270;
-
-    direction = UDEG * 60;
-    pdx = 4 * cos(direction);
-            pdy = 4 * sin(direction);
-
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    int up_pressed = 0, down_pressed = 0, right_pressed = 0, left_pressed = 0;
-    int hideMap = 0, q_pressed = 0;
-
-    
-    int quit = 0;
-    int time_d = 0;
+    init(&window, &renderer);
 
     while (quit == 0)
     {
@@ -241,7 +158,7 @@ int main(int argc, char **argv)
         // SDL_Delay(5);
     }
 
-    SDL_close(renderer, window, cosine, sine, tangent, aTan);   
+    SDL_close(renderer, window);   
 
     return 0;
 }
@@ -314,8 +231,7 @@ int handleEvents(int *up_pressed, int *down_pressed, int *left_pressed,
     return (quit);
 }
 
-void SDL_close(SDL_Renderer *renderer, SDL_Window *window, double *cosine,
-               double *sine, double *tangent, double *aTan)
+void SDL_close(SDL_Renderer *renderer, SDL_Window *window)
 {
     //Destroy renderer
     SDL_DestroyRenderer(renderer);

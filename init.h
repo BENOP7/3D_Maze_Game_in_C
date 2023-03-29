@@ -7,6 +7,7 @@
 
 void init(SDL_Window **, SDL_Renderer **);
 int SDL_create(SDL_Window **, SDL_Renderer **);
+void initTables(void);
 
 
 #endif

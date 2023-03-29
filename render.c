@@ -1,4 +1,4 @@
-#include "game.h"
+#include "main.h"
 #include "render.h"
 #include "update.h"
 #include "wall.ppm"
@@ -7,7 +7,7 @@
 void print()
 {
     float t = (playerX + 32)/ 2.0 + cos(PI/4) * 158 * 32 / 33.0 / 1.0;
-     printf("%d  ", t);
+     printf("%d  ", (int) t);
      printf("%d  %d ", texture[(int)t & 31], (int) t & 31 );
      printf("%d  ", (340 - PPLANE_HEIGHT / 2));
     // for (int i = 0; i < 32 * 32; i++)

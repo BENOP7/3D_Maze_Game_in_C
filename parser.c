@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "main.h"
 #include <stdio.h>
 
 int parseMap(char *filePath)

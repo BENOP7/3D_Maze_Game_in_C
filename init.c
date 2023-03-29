@@ -2,11 +2,38 @@
 #include <stdlib.h>
 #include <math.h>
 
+void init(SDL_Window **window, SDL_Renderer **renderer)
+{
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
+                SDL_GetError());
+        exit(EXIT_FAILURE);
+    }
+
+    if (SDL_create(window, renderer) != 0)
+    {
+        fprintf(stderr, "Could not initialize SDL window! SDL_Error: %s\n",
+                SDL_GetError());
+        exit(EXIT_FAILURE);
+    }
+
+    initTables();
+    
+    playerX = OFFSETX_2D + 144;
+    playerY = OFFSETY_2D + 270;
+    direction = ANGLE_60;
+    pdx = 4 * cos(direction);
+    pdy = 4 * sin(direction);
+
+}
+
 int SDL_create(SDL_Window **window, SDL_Renderer **renderer)
 {
-     *window = SDL_CreateWindow("Maze Shooter", SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                              SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    *window = SDL_CreateWindow("Maze Shooter - 3D Game",
+                               SDL_WINDOWPOS_CENTERED,
+                               SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
+                               SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (*window == NULL)
     {
         fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
@@ -25,23 +52,9 @@ int SDL_create(SDL_Window **window, SDL_Renderer **renderer)
 
     return (0);
 }
-void init(SDL_Window **window, SDL_Renderer **renderer)
+
+void initTables()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
-                SDL_GetError());
-        exit(EXIT_FAILURE);
-    }
-
-    if (SDL_create(window, renderer) != 0)
-    {
-        fprintf(stderr, "Could not initialize SDL window! SDL_Error: %s\n",
-                SDL_GetError());
-        exit(EXIT_FAILURE);
-    }
-
-    
     cosine = malloc(sizeof(*cosine) * 360);
     sine = malloc(sizeof(*sine) * 360);
     tangent = malloc(sizeof(*tangent) * 360);
@@ -62,11 +75,5 @@ void init(SDL_Window **window, SDL_Renderer **renderer)
         tangent[n] = tan(UDEG * n);
         aTan[n] = 1 / tangent[n];
     }
-
-    playerX = OFFSETX_2D + 144;
-    playerY = OFFSETY_2D + 270;
-    direction = ANGLE_60;
-    pdx = 4 * cos(direction);
-    pdy = 4 * sin(direction);
 
 }
