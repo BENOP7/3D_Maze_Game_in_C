@@ -41,7 +41,15 @@ extern double *sine;
 extern double *tangent;
 extern double *aTan;
 
-int handleEvents(int *, int *, int *, int *, int *);
+extern int time_d;
+extern int up_pressed;
+extern int down_pressed;
+extern int right_pressed;
+extern int left_pressed;
+extern int hideMap;
+extern int q_pressed;
+
+int handleEvents();
 void SDL_close(SDL_Renderer *, SDL_Window *);
 void checkEvent(SDL_Event e, int *quit, int *up_pressed, int *down_pressed, int *left_pressed, int *right_pressed);
 void eventHandler(int, int, int, int);

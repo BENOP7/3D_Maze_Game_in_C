@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+
 void init(SDL_Window **window, SDL_Renderer **renderer)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -19,6 +20,10 @@ void init(SDL_Window **window, SDL_Renderer **renderer)
     }
 
     initTables();
+
+    time_d = 0;
+    up_pressed = 0, down_pressed = 0, right_pressed = 0, left_pressed = 0;
+    hideMap = 0, q_pressed = 0;
     
     playerX = OFFSETX_2D + 144;
     playerY = OFFSETY_2D + 270;
