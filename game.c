@@ -12,21 +12,21 @@ void gameLoop(SDL_Renderer *renderer)
     {
         SDL_SetRenderDrawColor(renderer, 0x78, 0x78, 0x78, 55);
         SDL_RenderClear(renderer);
-        
+
         currentTime = SDL_GetTicks64();
         elapseTime = currentTime - previousTime;
         previousTime = currentTime;
-        
+
         quit = handleEvents();
 
         handleInputAction(elapseTime);
-        
+
         render(renderer, hideMap);
         render3D(renderer, hideMap);
 
         SDL_RenderPresent(renderer);
 
-        // SDL_Delay(5);
+        /* SDL_Delay(5); */
     }
 }
 

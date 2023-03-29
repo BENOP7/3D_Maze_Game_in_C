@@ -3,6 +3,7 @@
 #include "update.h"
 #include "wall.ppm"
 #include "texture.ppm"
+#include "w_axe_war.ppm"
 
 void print()
 {
@@ -152,7 +153,7 @@ void render3D(SDL_Renderer *renderer, int hideMap)
 
         for (int y = 0; y <= lineH; y++)
         {
-            SDL_SetRenderDrawColor(renderer, wall[(int) ty * 192 + ((int)tx * 3)] * shade, wall[(int) ty * 192 + ((int)tx * 3) + 1] * shade, wall[(int) ty * 192 + ((int)tx * 3) + 2] * shade, 255);
+            SDL_SetRenderDrawColor(renderer, t_axe[(int) ty * 192 + ((int)tx * 3)] * shade, t_axe[(int) ty * 192 + ((int)tx * 3) + 1] * shade, t_axe[(int) ty * 192 + ((int)tx * 3) + 2] * shade, 255);
             SDL_RenderDrawPoint(renderer, 50 + r, y + 60 + upperoff);
             ty += dy;
         }
@@ -196,6 +197,8 @@ void render3D(SDL_Renderer *renderer, int hideMap)
         if (ra > P2I) ra -= P2I;
 
     }
+
+    drawWeapon(renderer);
 }
 
 void render(SDL_Renderer * renderer, int hideMap)
@@ -251,10 +254,24 @@ void render(SDL_Renderer * renderer, int hideMap)
         SDL_RenderDrawLine(renderer, playerX, playerY, playerX + pdx * 3, playerY + pdy * 3);
         SDL_RenderDrawPoints(renderer, points, 100);
     }
+
     // if (direction % 30 == 0)
     //     printf("%i\t", direction);
     SDL_SetRenderDrawColor(renderer, 160, 22, 22, 255);
     // SDL_RenderDrawLine(renderer, playerX, playerY, intersections[0], intersections[1]);
 
 
+}
+
+void drawWeapon(SDL_Renderer *renderer)
+{
+    for (int y = 0; y <= GRID_SIZE; y++)
+    {
+        for (int x = 0; x <= GRID_SIZE; x++)
+        {
+            SDL_SetRenderDrawColor(renderer, t_axe[(int)y * 192 + ((int)x * 3)], t_axe[y * 192 + x * 3 + 1], t_axe[(int)y * 192 + (x * 3) + 2], 255);
+            SDL_RenderDrawPoint(renderer, 50 + y + 500, x + 60 + 438);
+        }
+        
+    }
 }

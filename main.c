@@ -55,7 +55,6 @@ int main(int argc, char **argv)
                 return (EXIT_FAILURE);
             }
     }
-    
     if (argc > 2)
     {
         fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
