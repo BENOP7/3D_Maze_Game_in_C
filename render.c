@@ -2,14 +2,15 @@
 #include "render.h"
 #include "update.h"
 #include "wall.ppm"
-#include "texture.ppm"
-#include "w_axe_war.ppm"
+#include "redbrick.ppm"
+#include "gunspt1.ppm"
+#include "grassLane.ppm"
 
 void print()
 {
     float t = (playerX + 32)/ 2.0 + cos(PI/4) * 158 * 32 / 33.0 / 1.0;
      printf("%d  ", (int) t);
-     printf("%d  %d ", texture[(int)t & 31], (int) t & 31 );
+    //  printf("%d  %d ", texture[(int)t & 31], (int) t & 31 );
      printf("%d  ", (340 - PPLANE_HEIGHT / 2));
     // for (int i = 0; i < 32 * 32; i++)
     // {
@@ -153,12 +154,12 @@ void render3D(SDL_Renderer *renderer, int hideMap)
 
         for (int y = 0; y <= lineH; y++)
         {
-            SDL_SetRenderDrawColor(renderer, t_axe[(int) ty * 192 + ((int)tx * 3)] * shade, t_axe[(int) ty * 192 + ((int)tx * 3) + 1] * shade, t_axe[(int) ty * 192 + ((int)tx * 3) + 2] * shade, 255);
+            SDL_SetRenderDrawColor(renderer, redWall[(int) ty * 192 + ((int)tx * 3)] * shade, redWall[(int) ty * 192 + ((int)tx * 3) + 1] * shade, redWall[(int) ty * 192 + ((int)tx * 3) + 2] * shade, 255);
             SDL_RenderDrawPoint(renderer, 50 + r, y + 60 + upperoff);
             ty += dy;
         }
-        float depth, raFix, dd, dxf, dyf, dist;
-        int c;
+        float depth, raFix, dd, dxf, dyf;
+        int off;
 
         for (int y = upperoff + lineH; y < PPLANE_HEIGHT; y++)
         {
@@ -167,17 +168,15 @@ void render3D(SDL_Renderer *renderer, int hideMap)
             depth = y - (PPLANE_HEIGHT / 2.0f);
 
             dd = DD * (GRID_SIZE / 2.0f) / depth;
-            // compute ray length
-            dist = dd / raFix;
 
-            dxf = cos(ra) * dist;
-            dyf = sin(ra) * dist;
+            dxf = cos(ra) * dd / raFix;
+            dyf = sin(ra) * dd / raFix;
 
-            tx = (playerX - OFFSETX_2D + dxf) / 2.0f;
-            ty = (playerY - OFFSETY_2D + dyf) / 2.0f;
+            tx = (playerX - OFFSETX_2D + dxf);
+            ty = (playerY - OFFSETY_2D + dyf);
 
-            c = texture[((int) ty % 32) * 32 + ((int) tx % 32)];
-            SDL_SetRenderDrawColor(renderer, c * 140, c * 140, c * 140, 255);
+            off = ((int) ty % 64) * 64 * 3 + (((int) tx % 64) * 3);
+            SDL_SetRenderDrawColor(renderer, lanefloor[off], lanefloor[off+1], lanefloor[off+2], 255);
             SDL_RenderDrawPoint(renderer, 50 + r, y + 60);
 
         }
@@ -185,8 +184,8 @@ void render3D(SDL_Renderer *renderer, int hideMap)
 
         // SDL_SetRenderDrawColor(renderer, 20, 150, 33, 255);
         // SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT + lineH) * 0.5, r + 50, 60 + PPLANE_HEIGHT);
-        // SDL_SetRenderDrawColor(renderer, 0x48, 0xA2, 0xFF, 255);
-        // SDL_RenderDrawLine(renderer, 50 + r, 60, r + 50, 60 + (PPLANE_HEIGHT - lineH) * 0.5);
+        SDL_SetRenderDrawColor(renderer, 0x48, 0xA2, 0xFF, 255);
+        SDL_RenderDrawLine(renderer, 50 + r, 60, r + 50, 60 + (PPLANE_HEIGHT - lineH) * 0.5);
         if (!hideMap)
         {
             SDL_SetRenderDrawColor(renderer, 200, 150, 133, 255);
@@ -197,7 +196,7 @@ void render3D(SDL_Renderer *renderer, int hideMap)
         if (ra > P2I) ra -= P2I;
 
     }
-
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     drawWeapon(renderer);
 }
 
@@ -265,12 +264,16 @@ void render(SDL_Renderer * renderer, int hideMap)
 
 void drawWeapon(SDL_Renderer *renderer)
 {
-    for (int y = 0; y <= GRID_SIZE; y++)
+    int c;
+    for (int y = 0; y < 170; y++)
     {
-        for (int x = 0; x <= GRID_SIZE; x++)
+        for (int x = 0; x < 180; x++)
         {
-            SDL_SetRenderDrawColor(renderer, t_axe[(int)y * 192 + ((int)x * 3)], t_axe[y * 192 + x * 3 + 1], t_axe[(int)y * 192 + (x * 3) + 2], 255);
-            SDL_RenderDrawPoint(renderer, 50 + y + 500, x + 60 + 438);
+            c = y * 180 * 3 + (x * 3);
+            if (gunsprit1[c] > 170 && gunsprit1[c + 1] > 170 && gunsprit1[c + 2] > 170)
+                continue;
+            SDL_SetRenderDrawColor(renderer, gunsprit1[c], gunsprit1[c + 1], gunsprit1[c + 2], 255);
+            SDL_RenderDrawPoint(renderer, x + 60 + 459, 50 + y + 322);
         }
         
     }
