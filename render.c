@@ -214,23 +214,23 @@ void render(SDL_Renderer * renderer, int hideMap)
     int idy;
     if (!hideMap)
     {
-        for (int i = OFFSETX_2D; i <= OFFSETX_2D + PLANE_SIZE2D; i += GRID_SIZE)
-        {
-            // Draw horizontal grid
-            SDL_RenderDrawLine(renderer, OFFSETX_2D, i - 650, OFFSETX_2D + PLANE_SIZE2D, i - 650);
-            // Draw vertical grid
-            SDL_RenderDrawLine(renderer, i, OFFSETY_2D, i, OFFSETY_2D + PLANE_SIZE2D);
-        }
+        // for (int i = OFFSETX_2D; i <= OFFSETX_2D + PLANE_SIZE2D / 8; i += GRID_SIZE / 8)
+        // {
+        //     // Draw vertical grid
+        //     SDL_RenderDrawLine(renderer, OFFSETX_2D, i - 130, OFFSETX_2D + PLANE_SIZE2D / 8, i - 130);
+        //     // Draw horizontal grid
+        //     SDL_RenderDrawLine(renderer, i, OFFSETY_2D, i, OFFSETY_2D + PLANE_SIZE2D / 8);
+        // }
 
-        for (int i = OFFSETX_2D; i < OFFSETX_2D + PLANE_SIZE2D; i += GRID_SIZE)
+        for (int i = OFFSETX_2D; i < OFFSETX_2D + PLANE_SIZE2D / 8; i += GRID_SIZE / 8)
         {
-            idx = (i - OFFSETX_2D) / GRID_SIZE;
-            for (int j = OFFSETY_2D; j < OFFSETY_2D + PLANE_SIZE2D; j += GRID_SIZE)
+            idx = (i - OFFSETX_2D) / (GRID_SIZE / 8);
+            for (int j = OFFSETY_2D; j < OFFSETY_2D + PLANE_SIZE2D / 8; j += GRID_SIZE / 8)
             {
-                idy = (j - OFFSETY_2D) / GRID_SIZE;
+                idy = (j - OFFSETY_2D) / (GRID_SIZE / 8);
                 if (worldmap[idy][idx] == 1)
                 {
-                    SDL_Rect rect = {i, j, GRID_SIZE, GRID_SIZE};
+                    SDL_Rect rect = {i, j, GRID_SIZE / 8, GRID_SIZE / 8};
                     SDL_RenderFillRect(renderer, &rect);
                 }
             }

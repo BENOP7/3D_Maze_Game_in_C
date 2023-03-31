@@ -25,7 +25,7 @@ void gameLoop(SDL_Renderer *renderer)
         render3D(renderer, hideMap);
 
         SDL_RenderPresent(renderer);
-
+        // printf("FPS: %d  ", 1000 / elapseTime);
         /* SDL_Delay(5); */
     }
 }
