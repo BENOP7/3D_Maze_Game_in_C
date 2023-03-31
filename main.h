@@ -7,7 +7,7 @@
 #define SCREEN_WIDTH 1360
 #define SCREEN_HEIGHT 720
 #define GRID_SIZE 64
-#define GRID_NUM 10
+#define GRID_NUM 20
 #define PLANE_SIZE2D (GRID_SIZE * GRID_NUM)
 #define PPLANE_WIDTH 640
 #define PPLANE_HEIGHT 480                     

@@ -6,22 +6,6 @@
 #include "gunspt1.ppm"
 #include "grassLane.ppm"
 
-void print()
-{
-    float t = (playerX + 32)/ 2.0 + cos(PI/4) * 158 * 32 / 33.0 / 1.0;
-     printf("%d  ", (int) t);
-    //  printf("%d  %d ", texture[(int)t & 31], (int) t & 31 );
-     printf("%d  ", (340 - PPLANE_HEIGHT / 2));
-    // for (int i = 0; i < 32 * 32; i++)
-    // {
-    //     printf("%d  ", texture[i]);
-    //     if ((i+1) % 8 == 0)
-    //         printf("\n");
-    //     if ((i + 1)% 64 == 0 )
-    //         printf("\n");
-    // }
-}
-
 void render3D(SDL_Renderer *renderer, int hideMap)
 {
     int mx, my, dof;
@@ -238,16 +222,16 @@ void render(SDL_Renderer * renderer, int hideMap)
 
         // Draw player
         SDL_SetRenderDrawColor(renderer, 15, 25, 165, 200);
-        SDL_Point points[100];
+        SDL_Point points[16];
 
-        for (int i = playerX - 5; i <= playerX + 4; i++)
+        for (int i = playerX - 2; i <= playerX + 1; i++)
         {
-            idx = i - playerX + 5;
+            idx = i - playerX + 2;
 
-            for (int j = playerY - 5; j <= playerY + 4; j++)
+            for (int j = playerY - 2; j <= playerY + 1; j++)
             {
                 SDL_Point holder = {.x = i, .y = j};
-                points[(int)(10 * idx + j - playerY + 5)] = holder;
+                points[(int)(4 * idx + j - playerY + 2)] = holder;
             }
         }
         SDL_RenderDrawLine(renderer, playerX, playerY, playerX + pdx * 3, playerY + pdy * 3);
