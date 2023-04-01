@@ -58,16 +58,16 @@ void render3D(SDL_Renderer *renderer, int hideMap)
         {
             rx = playerX - OFFSETX_2D;
             ry = playerY - OFFSETY_2D;
-            dof = 8;
+            dof = 20;
         }
 
-        while (dof < 8)
+        while (dof < 20)
         {            
             mx = ((int) rx) >> 6;
             my = ((int) ry) >> 6;
             if (mx >= 0 && my >= 0 && mx < GRID_NUM && my < GRID_NUM && worldmap[my][mx] > 0)
             {
-                dof = 8;
+                dof = 20;
                 hx = rx;
                 hy = ry;
                 distH = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, hx, hy);
@@ -102,16 +102,16 @@ void render3D(SDL_Renderer *renderer, int hideMap)
         {
             rx = playerX - OFFSETX_2D;
             ry = playerY - OFFSETY_2D;
-            dof = 8;
+            dof = 20;
         }
         
-        while (dof < 8)
+        while (dof < 20)
         {
             mx = ((int) rx) >> 6;
             my = ((int) ry) >> 6;
             if (mx >= 0 && my >= 0 && mx < GRID_NUM && my < GRID_NUM && worldmap[my][mx] > 0)
             {
-                dof = 8;
+                dof = 20;
                 vx = rx;
                 vy = ry;
                 distV = dist(playerX - OFFSETX_2D, playerY - OFFSETY_2D, vx, vy);

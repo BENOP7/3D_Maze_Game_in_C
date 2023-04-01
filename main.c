@@ -144,6 +144,7 @@ void initTables()
         tangent[n] = tan(UDEG * n);
         aTan[n] = 1 / tangent[n];
     }
+    printf("Here I go!\n");
 }
 
 void SDL_close(SDL_Renderer *renderer, SDL_Window *window)
