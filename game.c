@@ -10,7 +10,7 @@ void gameLoop(SDL_Renderer *renderer)
 
     while (quit == 0)
     {
-        SDL_SetRenderDrawColor(renderer, 0x78, 0x78, 0x78, 55);
+        SDL_SetRenderDrawColor(renderer, 0xAA, 0xAA, 0xAA, 0);
         SDL_RenderClear(renderer);
 
         currentTime = SDL_GetTicks64();
@@ -21,8 +21,9 @@ void gameLoop(SDL_Renderer *renderer)
 
         handleInputAction(elapseTime);
 
-        render(renderer, hideMap);
+        
         render3D(renderer, hideMap);
+        render(renderer, hideMap);
 
         SDL_RenderPresent(renderer);
         // printf("FPS: %d  ", 1000 / elapseTime);

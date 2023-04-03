@@ -4,8 +4,8 @@
 #include <SDL2/SDL.h>
 
 // Screen dimension extern constants
-#define SCREEN_WIDTH 1360
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 544
 #define GRID_SIZE 64
 #define GRID_NUM 20
 #define PLANE_SIZE2D (GRID_SIZE * GRID_NUM)
@@ -13,11 +13,11 @@
 #define PPLANE_HEIGHT 480                     
 #define DD 300                                /* Distance from player to projection plane*/
 
-#define OFFSETX_2D 700
-#define OFFSETY_2D 50
+#define OFFSETX_2D 55
+#define OFFSETY_2D 374
 #define UDEG 0.017453292519943
-#define DISPLAY_OFFSETX 45
-#define DISPLAY_OFFSETY 95
+#define DISPLAY_OFFSETX 0
+#define DISPLAY_OFFSETY 0
 
 extern const double ANGLE_60;
 extern const double ANGLE_30;
@@ -48,6 +48,16 @@ extern int right_pressed;
 extern int left_pressed;
 extern int hideMap;
 extern int q_pressed;
+
+typedef struct sprite
+{
+    int type;
+    int shown;
+    int map;
+    int x, y, z;
+} sprite_t;
+
+extern sprite_t sprites[10];
 
 int handleEvents();
 void SDL_close(SDL_Renderer *, SDL_Window *);

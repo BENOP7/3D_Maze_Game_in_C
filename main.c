@@ -41,6 +41,8 @@ double *aTan;
 //world
 int worldmap[GRID_NUM][GRID_NUM];
 
+sprite_t sprites[10]; /* list of all sprites */
+
     
 int main(int argc, char **argv)
 {
@@ -88,9 +90,11 @@ void init(SDL_Window **window, SDL_Renderer **renderer)
     time_d = 0;
     up_pressed = 0, down_pressed = 0, right_pressed = 0, left_pressed = 0;
     hideMap = 0, q_pressed = 0;
+    sprites[0].type = 1, sprites[0].shown = 1, sprites[0].map = 0, sprites[0].x = sprites[0].y = 268,
+    sprites[0].z = 20;
     
-    playerX = OFFSETX_2D + 144;
-    playerY = OFFSETY_2D + 270;
+    playerX = OFFSETX_2D + 300;
+    playerY = OFFSETY_2D + 280;
     direction = ANGLE_60;
     pdx = 4 * cos(direction);
     pdy = 4 * sin(direction);

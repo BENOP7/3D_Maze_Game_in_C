@@ -25,6 +25,8 @@ void print()
 void render3D(SDL_Renderer *renderer, int hideMap)
 {
     int mx, my, dof;
+    int playerMapX = (playerX - OFFSETX_2D) / 8 + OFFSETX_2D;
+    int playerMapY = (playerY - OFFSETY_2D) / 8 + OFFSETY_2D;
     float distT, lineH;
     float ra = direction - ANGLE_30; if (ra < 0) ra += P2I;
     float rx, ry, xo, yo;
@@ -155,7 +157,7 @@ void render3D(SDL_Renderer *renderer, int hideMap)
         for (int y = 0; y <= lineH; y++)
         {
             SDL_SetRenderDrawColor(renderer, redWall[(int) ty * 192 + ((int)tx * 3)] * shade, redWall[(int) ty * 192 + ((int)tx * 3) + 1] * shade, redWall[(int) ty * 192 + ((int)tx * 3) + 2] * shade, 255);
-            SDL_RenderDrawPoint(renderer, 50 + r, y + 60 + upperoff);
+            SDL_RenderDrawPoint(renderer, r, y + upperoff);
             ty += dy;
         }
         float depth, raFix, dd, dxf, dyf;
@@ -177,7 +179,7 @@ void render3D(SDL_Renderer *renderer, int hideMap)
 
             off = ((int) ty % 64) * 64 * 3 + (((int) tx % 64) * 3);
             SDL_SetRenderDrawColor(renderer, lanefloor[off], lanefloor[off+1], lanefloor[off+2], 255);
-            SDL_RenderDrawPoint(renderer, 50 + r, y + 60);
+            SDL_RenderDrawPoint(renderer,  DISPLAY_OFFSETX+ r, y + DISPLAY_OFFSETY);
 
         }
     
@@ -185,30 +187,31 @@ void render3D(SDL_Renderer *renderer, int hideMap)
         // SDL_SetRenderDrawColor(renderer, 20, 150, 33, 255);
         // SDL_RenderDrawLine(renderer, 50 + r, 60 + (PPLANE_HEIGHT + lineH) * 0.5, r + 50, 60 + PPLANE_HEIGHT);
         SDL_SetRenderDrawColor(renderer, 0x48, 0xA2, 0xFF, 255);
-        SDL_RenderDrawLine(renderer, 50 + r, 60, r + 50, 60 + (PPLANE_HEIGHT - lineH) * 0.5);
+        SDL_RenderDrawLine(renderer, DISPLAY_OFFSETX + r, DISPLAY_OFFSETY, DISPLAY_OFFSETX + r, DISPLAY_OFFSETY + (PPLANE_HEIGHT - lineH) * 0.5);
         if (!hideMap)
         {
             SDL_SetRenderDrawColor(renderer, 200, 150, 133, 255);
-            SDL_RenderDrawLine(renderer, playerX, playerY, rx + OFFSETX_2D, ry + OFFSETY_2D);
+            SDL_RenderDrawLine(renderer, playerMapX, playerMapY, rx / 8 + OFFSETX_2D, ry / 8 + OFFSETY_2D);
         }
 
         ra += INCR;
         if (ra > P2I) ra -= P2I;
 
     }
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     drawWeapon(renderer);
 }
 
 void render(SDL_Renderer * renderer, int hideMap)
 {
-    
-    SDL_SetRenderDrawColor(renderer, 80,32, 16, 255);
+    int playerMapX = (playerX - OFFSETX_2D) / 8 + OFFSETX_2D;
+    int playerMapY = (playerY - OFFSETY_2D) / 8 + OFFSETY_2D;
 
-    SDL_RenderDrawLine(renderer, 50, 60, 50 + PPLANE_WIDTH, 60);
-    SDL_RenderDrawLine(renderer, 50 + PPLANE_WIDTH, 60, 50 + PPLANE_WIDTH, 60 + PPLANE_HEIGHT);
-    SDL_RenderDrawLine(renderer, 50, 60, 50, 60 + PPLANE_HEIGHT);
-    SDL_RenderDrawLine(renderer, 50, 60 + PPLANE_HEIGHT, 50 + PPLANE_WIDTH, 60 + PPLANE_HEIGHT);
+    // SDL_SetRenderDrawColor(renderer, 80,32, 16, 255);
+
+    // SDL_RenderDrawLine(renderer, 50, 60, 50 + PPLANE_WIDTH, 60);
+    // SDL_RenderDrawLine(renderer, 50 + PPLANE_WIDTH, 60, 50 + PPLANE_WIDTH, 60 + PPLANE_HEIGHT);
+    // SDL_RenderDrawLine(renderer, 50, 60, 50, 60 + PPLANE_HEIGHT);
+    // SDL_RenderDrawLine(renderer, 50, 60 + PPLANE_HEIGHT, 50 + PPLANE_WIDTH, 60 + PPLANE_HEIGHT);
 
     int idx;
     int idy;
@@ -238,28 +241,23 @@ void render(SDL_Renderer * renderer, int hideMap)
 
         // Draw player
         SDL_SetRenderDrawColor(renderer, 15, 25, 165, 200);
-        SDL_Point points[100];
+        SDL_Point points[16];
 
-        for (int i = playerX - 5; i <= playerX + 4; i++)
+        for (int i = playerMapX - 2; i <= playerMapX + 1; i++)
         {
-            idx = i - playerX + 5;
+            idx = i - playerMapX + 2;
 
-            for (int j = playerY - 5; j <= playerY + 4; j++)
+            for (int j = playerMapY - 2; j <= playerMapY + 1; j++)
             {
                 SDL_Point holder = {.x = i, .y = j};
-                points[(int)(10 * idx + j - playerY + 5)] = holder;
+                points[(int)(4 * idx + j - playerMapY + 2)] = holder;
             }
         }
-        SDL_RenderDrawLine(renderer, playerX, playerY, playerX + pdx * 3, playerY + pdy * 3);
-        SDL_RenderDrawPoints(renderer, points, 100);
+        // SDL_RenderDrawLine(renderer, playerX, playerY, playerX + pdx * 1.5, playerY + pdy * 1.5);
+        SDL_RenderDrawPoints(renderer, points, 16);
     }
 
-    // if (direction % 30 == 0)
-    //     printf("%i\t", direction);
-    SDL_SetRenderDrawColor(renderer, 160, 22, 22, 255);
-    // SDL_RenderDrawLine(renderer, playerX, playerY, intersections[0], intersections[1]);
-
-
+    drawSprite(renderer);
 }
 
 void drawWeapon(SDL_Renderer *renderer)
@@ -277,4 +275,90 @@ void drawWeapon(SDL_Renderer *renderer)
         }
         
     }
+}
+
+// void drawSprite()
+// {
+//  int x,y,s;
+//  if(px<sp[0].x+30 && px>sp[0].x-30 && py<sp[0].y+30 && py>sp[0].y-30){ sp[0].state=0;} //pick up key 	
+//  if(px<sp[3].x+30 && px>sp[3].x-30 && py<sp[3].y+30 && py>sp[3].y-30){ gameState=4;} //enemy kills
+
+//  //enemy attack
+//  int spx=(int)sp[3].x>>6,          spy=(int)sp[3].y>>6;          //normal grid position
+//  int spx_add=((int)sp[3].x+15)>>6, spy_add=((int)sp[3].y+15)>>6; //normal grid position plus     offset
+//  int spx_sub=((int)sp[3].x-15)>>6, spy_sub=((int)sp[3].y-15)>>6; //normal grid position subtract offset
+//  if(sp[3].x>px && mapW[spy*8+spx_sub]==0){ sp[3].x-=0.04*fps;}
+//  if(sp[3].x<px && mapW[spy*8+spx_add]==0){ sp[3].x+=0.04*fps;}
+//  if(sp[3].y>py && mapW[spy_sub*8+spx]==0){ sp[3].y-=0.04*fps;}
+//  if(sp[3].y<py && mapW[spy_add*8+spx]==0){ sp[3].y+=0.04*fps;}
+
+//  for(s=0;s<4;s++)
+//  {
+//   float sx=sp[s].x-px; //temp float variables
+//   float sy=sp[s].y-py;
+//   float sz=sp[s].z;
+
+//   float CS=cos(degToRad(pa)), SN=sin(degToRad(pa)); //rotate around origin
+//   float a=sy*CS+sx*SN; 
+//   float b=sx*CS-sy*SN; 
+//   sx=a; sy=b;
+
+//   sx=(sx*108.0/sy)+(120/2); //convert to screen x,y
+//   sy=(sz*108.0/sy)+( 80/2);
+
+//   int scale=32*80/b;   //scale sprite based on distance
+//   if(scale<0){ scale=0;} if(scale>120){ scale=120;}  
+
+//   //texture
+//   float t_x=0, t_y=31, t_x_step=31.5/(float)scale, t_y_step=32.0/(float)scale;
+
+//   for(x=sx-scale/2;x<sx+scale/2;x++)
+//   {
+//    t_y=31;
+//    for(y=0;y<scale;y++)
+//    {
+//     if(sp[s].state==1 && x>0 && x<120 && b<depth[x])
+//     {
+//      int pixel=((int)t_y*32+(int)t_x)*3+(sp[s].map*32*32*3);
+//      int red   =sprites[pixel+0];
+//      int green =sprites[pixel+1];
+//      int blue  =sprites[pixel+2];
+//      if(red!=255, green!=0, blue!=255) //dont draw if purple
+//      {
+//       glPointSize(8); glColor3ub(red,green,blue); glBegin(GL_POINTS); glVertex2i(x*8,sy*8-y*8); glEnd(); //draw point 
+//      }
+//      t_y-=t_y_step; if(t_y<0){ t_y=0;}
+//     }
+//    }
+//    t_x+=t_x_step;
+//   }
+//  }
+// }
+
+void drawSprite(SDL_Renderer *renderer)
+{
+    float sx = 96 - playerX - OFFSETX_2D;
+    float sy = 96 - playerY - OFFSETY_2D;
+    float sz = 32;
+    float CS=cos(direction), SN=sin(direction); //rotate around origin
+    float a=sy*CS+sx*SN; 
+    float b=sx*CS-sy*SN; 
+    sx=a; sy=b;
+
+    sx=(sx*10/sy)+(320); //convert to screen x,y
+    sy=(sz*10/sy)+( 240);
+
+    SDL_SetRenderDrawColor(renderer, 15, 25, 165, 200);
+        SDL_Point points[100];
+
+        for (int i = -5; i <= 4; i++)
+        {
+            for (int j = -5; j <= 4; j++)
+            {
+                SDL_Point holder = {.x = i + sx, .y = j + sy};
+                points[(10 * (i + 5) + j + 5)] = holder;
+            }
+        }
+
+        SDL_RenderDrawPoints(renderer, points, 100);
 }
